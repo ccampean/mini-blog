@@ -1,0 +1,47 @@
+.img-logo {
+    margin-top: -6px;
+}
+.js-articles, 
+.js-moderated-articles, 
+.form-create-article,
+.form-contact {
+    width: 80%;
+    margin: 65px auto 0;
+    list-style-type: none;
+    text-align: center;
+}
+.input-group-addon {
+    top: 0px;
+}
+.js-login {
+    margin-left: 25px;
+}
+.js-edit-article {
+    margin-right: 4px;
+}
+.body-index-page .js-article-comments,
+.body-index-page .comment-text,
+.body-index-page .js-add-comment {
+    display: none;
+}
+div[data-comment-id] {
+    width: 50%;
+    margin: 0 auto 10px;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+.one-article .commentator-name,
+.one-article .commentator-msg {
+    width: 80%;
+    display: block;
+    margin: 0 auto;
+}
+.js-add-comment {
+    float: right;
+    margin-right: 10%;
+}
+.footer {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
