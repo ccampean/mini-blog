@@ -33,6 +33,7 @@ Comments.prototype.addComment = function(commentObject) {
         datatype: "json",
         data: commentObject,
         success: function(resp) {
+            // push the new model to this.models
             console.log('comentariul', resp);
         },
         error:function(xhr, status, errorMessage){

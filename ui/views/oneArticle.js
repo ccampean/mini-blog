@@ -2,9 +2,9 @@
 /*global $, Articles, Comments location*/
 
 $(window).ready(function(){
-    
-    var articlesContainer = $(".js-articles");
-    var moderatedArticlesContainer = $(".js-moderated-articles");
+
+    var articlesPerPageContainer = $('.js-rows');
+    var moderatedArticlesPerPageContainer = $('.js-moderated-rows');
     var articleById = new Articles();
     var commentsForArticle = new Comments();
     var articleId = parseInt(location.search.split('id=')[1], 10);
@@ -13,7 +13,6 @@ $(window).ready(function(){
     
     function listArticle() {
         var articleByIdModel = articleById.models;
-        // console.log('articleByIdModel', articleByIdModel);
         var articleByIdHTML =
             "<li class='article' data-article-id=" + articleByIdModel[0].article_id + 
             "><h3>" + articleByIdModel[0].title + "</h3>"+
@@ -32,11 +31,10 @@ $(window).ready(function(){
             "<button type='submit' class='btn btn-default js-edit-article'>Editeaza</button>" +
             "<button type='submit' class='btn btn-default js-delete-article'>Sterge</button>" +
             "</li>";
-        articlesContainer.append(articleByIdHTML);
-        moderatedArticlesContainer.append(moderatedArticleByIdHTML);
+        articlesPerPageContainer.append(articleByIdHTML);
+        moderatedArticlesPerPageContainer.append(moderatedArticleByIdHTML);
         var commentsForArticleDef = commentsForArticle.getComments(articleId);
         commentsForArticleDef.done(listComments);
-        // console.log('articleByIdModel.article_id', articleByIdModel.article_id);
         
         $('.js-add-comment').on('click', function() {
             captureComment();

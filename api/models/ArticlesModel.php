@@ -57,27 +57,35 @@ class ArticlesModel extends DB {
         return $sth->rowCount(); 
     }
     
-    // function sectionToDisplay($page_num, $rows_per_page) {
-    //     $start = ((int)$page_num - 1) * (int)$rows_per_page;
-    //     $total_rows = (int)$rows_per_page;
-    //     $params = [':from' => $start,
-    //               ':total_rows' => $total_rows];
-    //     $sql = 'SELECT `article_id`, `title`, `content`, `images`
-    //             FROM `articles`
-    //             ORDER BY `creation_date`
-    //             LIMIT :from, :total_rows';
-    //     $sth = $this->dbh->prepare($sql);
-    //     $sth->execute($params);
-        
-    //     return $sth->fetchAll(PDO::FETCH_ASSOC);
-    // }
+    function sectionToDisplay($page, $items) {
+        $start = ((int)$page - 1) * (int)$items;
+        $total_rows = (int)$items;
+        $sql = "SELECT `article_id`, `title`, `content`, `images`
+                FROM `articles`
+                ORDER BY `creation_date`
+                LIMIT :from, :total_rows";
+        $sth = $this->dbh->prepare($sql);
+        $sth->bindParam(':from', $start, PDO::PARAM_INT);
+        $sth->bindParam(':total_rows', $total_rows, PDO::PARAM_INT);
+        $sth->execute();
+        return $sth->fetchAll(PDO::FETCH_ASSOC);
+    }
     
-    // function amountRowsResultSet() {
-    //     $sql = 'SELECT COUNT(`article_id`) AS `total_rows`
-    //             FROM `articles`';
-    //     $sth = $this->dbh->prepare($sql);
-    //     $sth->execute();
+    function amountRowsResultSet() {
+        $sql = 'SELECT COUNT(`article_id`) AS `total_rows`
+             FROM `articles`';
+        $sth = $this->dbh->prepare($sql);
+        $sth->execute();
         
-    //     return $sth->fetch(PDO::FETCH_ASSOC);
-    // }
+        return $sth->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    function search($value) {
+        $sql = 'SELECT * FROM articles WHERE valid = 1 
+                AND (title LIKE :value OR content LIKE :value)';
+        $sth = $this->dbh->prepare($sql);
+        $sth->execute(array(":value" => "%$value%"));
+        
+        return $sth->fetchAll(PDO::FETCH_ASSOC);   
+    }
 }

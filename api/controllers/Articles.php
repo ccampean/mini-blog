@@ -66,13 +66,25 @@ class Articles {
         } 
     }
 
-    //function displaySection() {
-    //    $articlesModel = new ArticlesModel();
-    //    return $articlesModel->sectionToDisplay($page_num, $rows_per_page);
-    //}
+    function displaySection() {
+        if (isset($_POST["page"]) && isset($_POST["items"])) {
+            $page = $_POST["page"];
+            $items = $_POST["items"];
+            $articlesModel = new ArticlesModel();
+            return $articlesModel->sectionToDisplay($page, $items);
+        }
+    }
     
-    //function countRows() {
-    //    $articlesModel = new ArticlesModel();
-    //    return $articlesModel->amountRowsResultSet();
-    //}
+    function countRows() {
+        $articlesModel = new ArticlesModel();
+        return $articlesModel->amountRowsResultSet();
+    }
+    
+    function searchQuery() {
+        if (isset($_GET["searchQuery"])) {
+            $articlesModel = new ArticlesModel();
+            $value = htmlspecialchars($_GET["searchQuery"]);
+            return $articlesModel->search($value);
+        }
+    }
 }

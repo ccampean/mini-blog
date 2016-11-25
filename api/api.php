@@ -1,10 +1,8 @@
 <?php
 
-// echo "<pre>";
-// print_r($_SERVER);
-
-// START SESSION FOR APP
 session_start();
+
+// error_reporting(E_ALL);
 
 ini_set('display_errors', 1);
 
@@ -23,10 +21,12 @@ $routes["/api/articles/delete"] = array("controller" => "Articles",
                                 "method" => "deleteArticle");
 $routes["/api/articles/update"] = array("controller" => "Articles",
                                 "method" => "updateArticle");
-// $routes["/api/articles/page/{page_num}/{rows_per_page}"] = array("controller" => "Articles",
-//                                 "method" => "displaySection");
-// $routes["/api/articles/countrows"] = array("controller" => "Articles",
-//                                 "method" => "countRows");                                 
+$routes["/api/articles/pagination"] = array("controller" => "Articles",
+                                "method" => "displaySection");
+$routes["/api/articles/countrows"] = array("controller" => "Articles",
+                                "method" => "countRows");   
+$routes["/api/articles/search"] = array("controller" => "Articles",
+                                "method" => "searchQuery");                                 
             
 $routes["/api/comments"] = array("controller" => "Comments",
                                 "method" => "index");                                
@@ -41,12 +41,6 @@ $routes["/api/logout"] = array("controller" => "Login",
                             "method" => "logout");
 $routes["/api/session"] = array("controller" => "Login",
                             "method" => "checkSession");
-
-// api_response($_POST, http_response_code());
-// exit;
-
-// echo "<pre>";
-// var_dump(rtrim($_SERVER['PATH_INFO'], '/'));
 
 if (isset($_SERVER["REDIRECT_URL"])) {
     $key = rtrim($_SERVER['REDIRECT_URL'], '/');

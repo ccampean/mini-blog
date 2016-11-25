@@ -1,39 +1,64 @@
+/*global $, Articles, location*/
 
-/*global $, Articles, Comments, location*/
-
-$(window).ready(function(){
+$(window).ready(function() {
     
-    var articlesContainer = $(".js-articles");
-    var moderatedArticlesContainer = $(".js-moderated-articles");
-    var articles = new Articles();
-    var articlesDef = articles.getArticles();
-    articlesDef.done(listComments);
+    // pagination is implemented following this tutorial, https://www.sitepoint.com/pagination-jquery-ajax-php/
+    var articlesPerPageContainer = $('.js-rows');
+    var moderatedArticlesPerPageContainer = $('.js-moderated-rows');
+    var rows_per_page = 2;
+    var total_rows;
+    var page_num = 1;
+    var articlesPerPage = new Articles();
+    var articlesPerPageDef = articlesPerPage.page(page_num, rows_per_page);
+    articlesPerPageDef.done(listArticles);
     
-    function listComments(){
-        var articleModels = articles.models;
+    (function initPageNumbers() {
+        return $.ajax({
+            url: "/api/articles/countrows",
+            type: "GET",
+            dataType: "json",
+            success: function(resp) {
+                total_rows = parseInt(resp.total_rows, 10);
+                //Loop through every available page and output a page link
+                var count = 1;
+                $('.page-numbers').append('<li><a href="#">&laquo;</a></li>');
+                for (var x = 0;  x < total_rows; x += rows_per_page) {
+                    $('.page-numbers').append('<li><a class="js-current-page" data-page="' + count + '" data-items="' + rows_per_page + '" href=" " >' + count + '</a></li>');
+                    count++;
+                }
+                $('.page-numbers').append('<li><a href="#">&raquo;</a></li>');
+            },
+            error: function(xhr, status, errorMessage) {
+                console.log("Statusul erorii la GET ul numarului de articole din db: ", status);
+            }
+        });
+    })();
+    
+    function listArticles() {
+        var articlesPerPageModels = articlesPerPage.models;
 
-        for (var i=0; i < articleModels.length; i++){
+        for (var i=0; i < articlesPerPageModels.length; i++){
             var articleHtml = 
                 "<a href='//simple-blog-ccampean.c9users.io/ui/pages/one-article.html?id=" + 
-                articleModels[i].article_id + "' target='_blank'>" +
-                "<li data-article-id=" + articleModels[i].article_id + 
-                "><h3>" + articleModels[i].title + "</h3>"+
-                "<div>"+articleModels[i].content+"</div>"+
+                articlesPerPageModels[i].article_id + "' target='_blank'>" +
+                "<li data-article-id=" + articlesPerPageModels[i].article_id + 
+                "><h3>" + articlesPerPageModels[i].title + "</h3>"+
+                "<div>"+articlesPerPageModels[i].content+"</div>"+
                 "<div class='js-article-comments'></div>"+
                 "<textarea class='comment-text'></textarea>" +
                 "<button class=js-add-comment>Add Comment</button>" +
                 "</li>" + "</a>";
             var moderatedArticleHTML = 
                 "<li data-article-id=" + 
-                articleModels[i].article_id + "><h3>" + 
-                articleModels[i].title + "</h3>" + "<div>" + 
-                articleModels[i].content+"</div>" + 
+                articlesPerPageModels[i].article_id + "><h3>" + 
+                articlesPerPageModels[i].title + "</h3>" + "<div>" + 
+                articlesPerPageModels[i].content+"</div>" + 
                 "<a href='//simple-blog-ccampean.c9users.io/ui/pages/update-article.html?id=" + 
-                articleModels[i].article_id + "' target='_blank'>" +
+                articlesPerPageModels[i].article_id + "' target='_blank'>" +
                 "<button type='submit' class='btn btn-default js-edit-article'>Editeaza</button></a>" +
                 "<button type='submit' class='btn btn-default js-delete-article'>Sterge</button>";
-            articlesContainer.append(articleHtml);
-            moderatedArticlesContainer.append(moderatedArticleHTML);
+            articlesPerPageContainer.append(articleHtml);
+            moderatedArticlesPerPageContainer.append(moderatedArticleHTML);
         }
     }
     
@@ -45,7 +70,7 @@ $(window).ready(function(){
     
     $('.js-login').on('click', function(event) {
         event.preventDefault();
-        // console.log("logat");
+        //ajax requests for login/logout should be done in User model
         return $.ajax({
             url: "/api/login",
             type: "POST",
@@ -90,13 +115,12 @@ $(window).ready(function(){
         });
     });
     
-    $('.js-moderated-articles').on('click','button.js-delete-article', function() {
+    $('.js-moderated-articles').on('click', 'button.js-delete-article', function() {
         var articleId = $(this).closest("li").attr('data-article-id');
         var deletedArticle = new Articles();
         deletedArticle.delete(articleId);
+        //reomve the article from UI only when delete from DB is successful
         $(this).closest("li").remove();
-        // console.log($(this).parents("li:first").attr('data-article-id'));
-        // console.log($(this).closest("li").attr('data-article-id'));
     });
     
     // eventListener pentru butonul "Iesire" 
@@ -135,20 +159,32 @@ $(window).ready(function(){
         prepareArticle.add(formData);
     });
     
-    // var rows_per_page = 2;
-    // var total_rows;
+    $('.js-input-search').on('keyup', function(event) {
+        event.preventDefault();
+        articlesPerPageContainer.empty();
+        moderatedArticlesPerPageContainer.empty();
+        $('.page-numbers').empty();
+        
+        var searchQuery = $('[name="searchQuery"]').val();
+        articlesPerPage = new Articles();
+        articlesPerPageDef = articlesPerPage.search(searchQuery);
+        articlesPerPageDef.done(listArticles);
+        
+        if (!this.value) {
+            location.reload();
+        }
+    });
     
-    // function initPageNumbers() {
-    //     //Get total rows number
-    //     $.get('/api/articles/countrows', function(data){
-    //         total_rows = parseInt(data.total_rows);
-    
-    //         //Loop through every available page and output a page link
-    //         var count = 1;
-    //         for (var x = 0;  x < total_rows; x += rows_per_page) {
-    //             $('#page-numbers').append('<li><a href="#'+count+'" onclick="getPage('+count+');">'+count+'</a></li>');
-    //             count++;
-    //         }
-    //     });
-    // }
+    // eventListener pus pe fiecare numar de pagina, care incarca articolele corespunzatoare
+    $('.page-numbers').on('click', '.js-current-page', function(event) {
+        event.preventDefault();
+        articlesPerPageContainer.empty();
+        moderatedArticlesPerPageContainer.empty();
+        // console.log('page is', $(this).attr('data-page'));
+        page_num = $(this).attr('data-page');
+        rows_per_page = $(this).attr('data-items');
+        articlesPerPage = new Articles();
+        articlesPerPageDef = articlesPerPage.page(page_num, rows_per_page);
+        articlesPerPageDef.done(listArticles);
+    });
 });

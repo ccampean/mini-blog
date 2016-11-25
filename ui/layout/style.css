@@ -1,8 +1,8 @@
 .img-logo {
     margin-top: -6px;
 }
-.js-articles, 
-.js-moderated-articles, 
+.js-rows, 
+.js-moderated-rows, 
 .form-create-article,
 .form-contact {
     width: 80%;
@@ -13,9 +13,38 @@
 .input-group-addon {
     top: 0px;
 }
+
 .js-login {
     margin-left: 25px;
 }
+
+
+/*styles for pagination*/
+.page-numbers {
+    width: 100%;
+    display: inline-block;
+    padding: 0;
+    /*transform: translateX(80%);*/
+}
+.page-numbers li {
+    display: inline;
+}
+.page-numbers li a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+}
+.page-numbers li a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+.page-numbers li a:hover:not(.active) {
+    background-color: #ddd;
+}
+
+
 .js-edit-article {
     margin-right: 4px;
 }
@@ -42,6 +71,6 @@ div[data-comment-id] {
 }
 .footer {
     width: 100%;
-    position: absolute;
+    position: fixed;
     bottom: 0;
 }
