@@ -64,7 +64,7 @@ Articles.prototype.search = function(searchQuery) {
             console.log('Eroare la cautare: ', status);
         }
     });
-}
+};
 
 Articles.prototype.delete = function(articleId) {
     return $.ajax({

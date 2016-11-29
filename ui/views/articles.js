@@ -5,11 +5,14 @@ $(window).ready(function() {
     // pagination is implemented following this tutorial, https://www.sitepoint.com/pagination-jquery-ajax-php/
     var articlesPerPageContainer = $('.js-rows');
     var moderatedArticlesPerPageContainer = $('.js-moderated-rows');
+    var $pageNumbers = $('.page-numbers');
     var rows_per_page = 2;
     var total_rows;
-    var page_num = 1;
+    // var page_num = 1;
+    var currentPageNum = 1;
+    var targetPageNum = 1;
     var articlesPerPage = new Articles();
-    var articlesPerPageDef = articlesPerPage.page(page_num, rows_per_page);
+    var articlesPerPageDef = articlesPerPage.page(targetPageNum, rows_per_page);
     articlesPerPageDef.done(listArticles);
     
     (function initPageNumbers() {
@@ -21,12 +24,16 @@ $(window).ready(function() {
                 total_rows = parseInt(resp.total_rows, 10);
                 //Loop through every available page and output a page link
                 var count = 1;
-                $('.page-numbers').append('<li><a href="#">&laquo;</a></li>');
+                $pageNumbers.append('<li><a href="#" class="prev-page">&laquo;</a></li>');
+                var template = '';
                 for (var x = 0;  x < total_rows; x += rows_per_page) {
-                    $('.page-numbers').append('<li><a class="js-current-page" data-page="' + count + '" data-items="' + rows_per_page + '" href=" " >' + count + '</a></li>');
+                    template += '<li><a class="js-current-page" data-page="' + count + '" data-items="' + rows_per_page + '" href=" " >' + count + '</a></li>';
                     count++;
                 }
-                $('.page-numbers').append('<li><a href="#">&raquo;</a></li>');
+                
+                $pageNumbers.append(template);
+                $pageNumbers.append('<li><a href="#" class="next-page">&raquo;</a></li>');
+                $($('.page-numbers .js-current-page')[0]).addClass('active');
             },
             error: function(xhr, status, errorMessage) {
                 console.log("Statusul erorii la GET ul numarului de articole din db: ", status);
@@ -80,7 +87,6 @@ $(window).ready(function() {
                 password: $('[name="password"]').val()
             },
             success: function(resp) {
-                // console.log(resp);
                 if (resp.isLogged) {
                     window.location.href = "//simple-blog-ccampean.c9users.io/ui/pages/dashboard.html";
                 }
@@ -153,8 +159,7 @@ $(window).ready(function() {
         formData.append("images", $('.images-input')[0].files[0]);
         formData.append("title", $('.title-input').val());
         formData.append("content", $('.content-input').val());
-        
-        console.log('articleData', formData);
+    
         var prepareArticle = new Articles();
         prepareArticle.add(formData);
     });
@@ -173,18 +178,45 @@ $(window).ready(function() {
         if (!this.value) {
             location.reload();
         }
-    });
+    }); 
     
     // eventListener pus pe fiecare numar de pagina, care incarca articolele corespunzatoare
-    $('.page-numbers').on('click', '.js-current-page', function(event) {
+    $pageNumbers.on('click', '.js-current-page', function(event) {
         event.preventDefault();
         articlesPerPageContainer.empty();
         moderatedArticlesPerPageContainer.empty();
-        // console.log('page is', $(this).attr('data-page'));
-        page_num = $(this).attr('data-page');
+        $('.page-numbers .js-current-page').removeClass('active');
+        $(this).addClass('active');
+        currentPageNum = $(this).attr('data-page');
         rows_per_page = $(this).attr('data-items');
         articlesPerPage = new Articles();
-        articlesPerPageDef = articlesPerPage.page(page_num, rows_per_page);
+        articlesPerPageDef = articlesPerPage.page(currentPageNum, rows_per_page);
         articlesPerPageDef.done(listArticles);
+    });
+    
+    function appendArticles(targetButton) {
+        articlesPerPageContainer.empty();
+        moderatedArticlesPerPageContainer.empty();
+        currentPageNum = +$('.page-numbers .js-current-page.active').attr('data-page');
+        targetPageNum = (targetButton == 'next') ? currentPageNum + 1 : currentPageNum - 1;
+        $('.js-current-page[data-page="' + currentPageNum +'"]').removeClass('active');
+        $('.js-current-page[data-page="' + targetPageNum +'"]').addClass('active');
+        articlesPerPage = new Articles();
+        articlesPerPageDef = articlesPerPage.page(targetPageNum, rows_per_page);
+        articlesPerPageDef.done(listArticles);
+    }
+    
+    $pageNumbers.on('click', '.next-page', function(event) {
+        event.preventDefault();
+        if ((+$('.page-numbers .js-current-page.active').attr('data-page')) <= Math.ceil(total_rows/rows_per_page) - 1) {
+            appendArticles('next');
+        }
+    });
+    
+    $pageNumbers.on('click', '.prev-page', function(event) {
+        event.preventDefault();
+        if ((+$('.page-numbers .js-current-page.active').attr('data-page')) > Math.ceil(total_rows/total_rows)) {
+            appendArticles('prev');
+        }
     });
 });
