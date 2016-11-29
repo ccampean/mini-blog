@@ -6,7 +6,7 @@ $(window).ready(function() {
     var articlesPerPageContainer = $('.js-rows');
     var moderatedArticlesPerPageContainer = $('.js-moderated-rows');
     var $pageNumbers = $('.page-numbers');
-    var rows_per_page = 2;
+    var rows_per_page = 3;
     var total_rows;
     // var page_num = 1;
     var currentPageNum = 1;
@@ -30,7 +30,6 @@ $(window).ready(function() {
                     template += '<li><a class="js-current-page" data-page="' + count + '" data-items="' + rows_per_page + '" href=" " >' + count + '</a></li>';
                     count++;
                 }
-                
                 $pageNumbers.append(template);
                 $pageNumbers.append('<li><a href="#" class="next-page">&raquo;</a></li>');
                 $($('.page-numbers .js-current-page')[0]).addClass('active');
@@ -49,21 +48,22 @@ $(window).ready(function() {
                 "<a href='//simple-blog-ccampean.c9users.io/ui/pages/one-article.html?id=" + 
                 articlesPerPageModels[i].article_id + "' target='_blank'>" +
                 "<li data-article-id=" + articlesPerPageModels[i].article_id + 
-                "><h3>" + articlesPerPageModels[i].title + "</h3>"+
-                "<div>"+articlesPerPageModels[i].content+"</div>"+
-                "<div class='js-article-comments'></div>"+
-                "<textarea class='comment-text'></textarea>" +
-                "<button class=js-add-comment>Add Comment</button>" +
+                "><div class='container-img'><img src='" + "/uploads/" + articlesPerPageModels[i].images + 
+                "' alt='reprezentative-picture' width='190' height='160' class='article-picture'></div><div class='container-body-article'><h3>" + 
+                articlesPerPageModels[i].title + "</h3>"+
+                "<div>"+articlesPerPageModels[i].content+"</div></div>"+
                 "</li>" + "</a>";
             var moderatedArticleHTML = 
                 "<li data-article-id=" + 
-                articlesPerPageModels[i].article_id + "><h3>" + 
+                articlesPerPageModels[i].article_id + "><div class='container-img'><img src='" + 
+                "/uploads/" + articlesPerPageModels[i].images + 
+                "' alt='reprezentative-picture' width='190' height='160' class='article-picture'></div><div class='container-body-article'><h3>" + 
                 articlesPerPageModels[i].title + "</h3>" + "<div>" + 
-                articlesPerPageModels[i].content+"</div>" + 
+                articlesPerPageModels[i].content+"</div></div><div class='container-article-buttons'>" + 
                 "<a href='//simple-blog-ccampean.c9users.io/ui/pages/update-article.html?id=" + 
                 articlesPerPageModels[i].article_id + "' target='_blank'>" +
                 "<button type='submit' class='btn btn-default js-edit-article'>Editeaza</button></a>" +
-                "<button type='submit' class='btn btn-default js-delete-article'>Sterge</button>";
+                "<button type='submit' class='btn btn-default js-delete-article'>Sterge</button></div>";
             articlesPerPageContainer.append(articleHtml);
             moderatedArticlesPerPageContainer.append(moderatedArticleHTML);
         }
